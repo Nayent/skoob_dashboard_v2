@@ -1,0 +1,18 @@
+{
+  "users": {
+    "67bd205070c4abc337039786": {
+      "user_id": "67bd205070c4abc337039786",
+      "name": "Guilherme Nomura",
+      "status": "success",
+      "error": null,
+      "updated_at": "2026-07-31T05:37:14+00:00"
+    },
+    "67bd205070c4abc337039957": {
+      "status": "success",
+      "error": null,
+      "user_id": "67bd205070c4abc337039957",
+      "updated_at": "2026-07-31T05:37:21+00:00",
+      "name": "Raphael Nomura"
+    }
+  }
+}
