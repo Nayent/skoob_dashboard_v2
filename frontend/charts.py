@@ -146,6 +146,12 @@ def pending_goal_section(df: pd.DataFrame) -> None:
 
     total_books = len(pending)
     total_pages = pending["PaginasRestantes"].sum()
+    goal_total_books = len(df)
+    goal_total_pages = pd.to_numeric(df[page_col], errors="coerce").fillna(0).sum()
+    completed_books = goal_total_books - total_books
+    completed_pages = max(0, goal_total_pages - total_pages)
+    books_progress_pct = completed_books / goal_total_books * 100 if goal_total_books else 0
+    pages_progress_pct = completed_pages / goal_total_pages * 100 if goal_total_pages else 0
     books_with_pages = pending[pending[page_col] > 0]
     books_for_size = books_with_pages if not books_with_pages.empty else pending
     largest = books_for_size.loc[books_for_size[page_col].idxmax()]
@@ -159,6 +165,22 @@ def pending_goal_section(df: pd.DataFrame) -> None:
     end_of_year = pd.Timestamp(year=today.year, month=12, day=31)
     days_remaining = max(1, (end_of_year - today).days + 1)
     pages_per_day = total_pages / days_remaining
+
+    progress_cols = st.columns(2)
+    with progress_cols[0]:
+        with st.container(border=True):
+            st.metric("Progresso de páginas", f"{pages_progress_pct:.1f}%")
+            st.progress(
+                min(1.0, pages_progress_pct / 100),
+                text=f"{completed_pages:,.0f} de {goal_total_pages:,.0f} páginas".replace(",", "."),
+            )
+    with progress_cols[1]:
+        with st.container(border=True):
+            st.metric("Progresso de livros", f"{books_progress_pct:.1f}%")
+            st.progress(
+                min(1.0, books_progress_pct / 100),
+                text=f"{completed_books} de {goal_total_books} livros",
+            )
 
     kpi_cols = st.columns(5)
     kpi_cols[0].metric("Livros pendentes", f"{total_books}")
@@ -190,19 +212,34 @@ def pending_goal_section(df: pd.DataFrame) -> None:
     chart_cols = st.columns(2)
     with chart_cols[0]:
         status_counts = (
-            pending["status"]
+            df["status"]
             .map({
+                "read": "Lido",
                 "to_read": "Quero ler",
                 "want_to_read": "Quero ler",
                 "reading": "Lendo",
+                "rereading": "Relendo",
             })
+            .fillna(df["status"])
             .value_counts()
             .rename_axis("Status")
             .reset_index(name="Livros")
         )
-        fig = px.bar(status_counts, x="Status", y="Livros", text="Livros")
-        fig.update_traces(marker_color="#00CC96", textposition="outside")
-        fig.update_layout(**_PLOTLY_LAYOUT, xaxis={"type": "category"})
+        fig = px.pie(
+            status_counts,
+            names="Status",
+            values="Livros",
+            hole=0.58,
+            color="Status",
+            color_discrete_map={
+                "Lido": "#00CC96",
+                "Lendo": "#FECB52",
+                "Relendo": "#636EFA",
+                "Quero ler": "#EF553B",
+            },
+        )
+        fig.update_traces(textposition="inside", textinfo="label+percent")
+        fig.update_layout(**_PLOTLY_LAYOUT, showlegend=True)
         st.plotly_chart(fig, use_container_width=True)
 
     with chart_cols[1]:

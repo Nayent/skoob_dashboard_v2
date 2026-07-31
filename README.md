@@ -10,7 +10,7 @@ Dashboard em Streamlit para visualizar a estante do Skoob, acompanhar a meta de 
 - KPIs de livros, páginas lidas e ritmo de leitura.
 - Gráficos de leituras ao longo do tempo, autores e editoras.
 - Top 10 livros melhor avaliados.
-- Análise dos livros pendentes da meta atual, incluindo páginas restantes e pace necessário até o fim do ano.
+- Análise dos livros pendentes da meta atual, incluindo percentuais de progresso de páginas e livros, status em gráfico de rosca e pace necessário até o fim do ano.
 - Cadastro, edição e exclusão de usuários pela página de gerenciamento.
 - Atualização dos dados diretamente pela dashboard.
 
